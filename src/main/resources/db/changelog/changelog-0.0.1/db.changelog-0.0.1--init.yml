@@ -1,0 +1,307 @@
+databaseChangeLog:
+  # ----- Création des tables -----
+  - changeSet:
+      id: 1
+      author: prt
+      changes:
+        - createTable:
+            tableName: armee
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+              - column:
+                  name: libelle
+                  type: text
+
+  - changeSet:
+      id: 2
+      author: prt
+      changes:
+        - createTable:
+            tableName: grade
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+              - column:
+                  name: libelle
+                  type: text
+              - column:
+                  name: libelle_court
+                  type: text
+              - column:
+                  name: armee_id
+                  type: uuid
+              - column:
+                  name: niveau
+                  type: text
+
+  - changeSet:
+      id: 3
+      author: prt
+      changes:
+        - createTable:
+            tableName: personnel
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+              - column:
+                  name: grade_id
+                  type: uuid
+              - column:
+                  name: nom
+                  type: text
+              - column:
+                  name: prenom
+                  type: text
+
+  - changeSet:
+      id: 4
+      author: prt
+      changes:
+        - createTable:
+            tableName: seance
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+              - column:
+                  name: perception_stande_at
+                  type: date
+              - column:
+                  name: nettoyage_on
+                  type: timestamp with time zone
+              - column:
+                  name: note_service
+                  type: text
+              - column:
+                  name: description
+                  type: text
+              - column:
+                  name: date_debut
+                  type: timestamp
+              - column:
+                  name: date_fin
+                  type: timestamp
+
+  - changeSet:
+      id: 5
+      author: prt
+      changes:
+        - createTable:
+            tableName: arme
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+              - column:
+                  name: nom
+                  type: text
+              - column:
+                  name: type
+                  type: varchar(255)
+
+  - changeSet:
+      id: 6
+      author: prt
+      changes:
+        - createTable:
+            tableName: qualification
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+              - column:
+                  name: libelle
+                  type: text
+              - column:
+                  name: duree_validite
+                  type: bigint
+
+  - changeSet:
+      id: 7
+      author: prt
+      changes:
+        - createTable:
+            tableName: participation
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+              - column:
+                  name: seance_id
+                  type: uuid
+              - column:
+                  name: personnel_id
+                  type: uuid
+
+  - changeSet:
+      id: 8
+      author: prt
+      changes:
+        - createTable:
+            tableName: participation_qualification
+            columns:
+              - column:
+                  name: participation_id
+                  type: uuid
+              - column:
+                  name: qualification_id
+                  type: uuid
+              - column:
+                  name: arme_id
+                  type: uuid
+              - column:
+                  name: is_validate
+                  type: boolean
+              - column:
+                  name: date
+                  type: date
+
+  - changeSet:
+      id: 9
+      author: prt
+      changes:
+        - createTable:
+            tableName: tache_statut
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+              - column:
+                  name: libelle
+                  type: text
+              - column:
+                  name: is_terminee
+                  type: boolean
+
+  - changeSet:
+      id: 10
+      author: prt
+      changes:
+        - createTable:
+            tableName: tache
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+              - column:
+                  name: seance_id
+                  type: uuid
+              - column:
+                  name: libelle
+                  type: text
+              - column:
+                  name: echeance_at
+                  type: date
+              - column:
+                  name: statut_id
+                  type: uuid
+
+  # ----- Ajout des Primary Keys -----
+  - changeSet:
+      id: 11
+      author: prt
+      changes:
+        - addPrimaryKey:
+            tableName: armee
+            columnNames: id
+            constraintName: pk_armee
+        - addPrimaryKey:
+            tableName: grade
+            columnNames: id
+            constraintName: pk_grade
+        - addPrimaryKey:
+            tableName: personnel
+            columnNames: id
+            constraintName: pk_personnel
+        - addPrimaryKey:
+            tableName: seance
+            columnNames: id
+            constraintName: pk_seance
+        - addPrimaryKey:
+            tableName: arme
+            columnNames: id
+            constraintName: pk_arme
+        - addPrimaryKey:
+            tableName: qualification
+            columnNames: id
+            constraintName: pk_qualification
+        - addPrimaryKey:
+            tableName: participation
+            columnNames: id
+            constraintName: pk_participation
+        - addPrimaryKey:
+            tableName: participation_qualification
+            columnNames: participation_id,qualification_id,arme_id
+            constraintName: pk_participation_qualification
+        - addPrimaryKey:
+            tableName: tache_statut
+            columnNames: id
+            constraintName: pk_tache_statut
+        - addPrimaryKey:
+            tableName: tache
+            columnNames: id
+            constraintName: pk_tache
+
+  # ----- Ajout des Foreign Keys -----
+  - changeSet:
+      id: 12
+      author: prt
+      changes:
+        - addForeignKeyConstraint:
+            baseTableName: grade
+            baseColumnNames: armee_id
+            referencedTableName: armee
+            referencedColumnNames: id
+            constraintName: fk_grade_armee
+        - addForeignKeyConstraint:
+            baseTableName: personnel
+            baseColumnNames: grade_id
+            referencedTableName: grade
+            referencedColumnNames: id
+            constraintName: fk_personnel_grade
+        - addForeignKeyConstraint:
+            baseTableName: participation
+            baseColumnNames: seance_id
+            referencedTableName: seance
+            referencedColumnNames: id
+            constraintName: fk_participation_seance
+        - addForeignKeyConstraint:
+            baseTableName: participation
+            baseColumnNames: personnel_id
+            referencedTableName: personnel
+            referencedColumnNames: id
+            constraintName: fk_participation_personnel
+        - addForeignKeyConstraint:
+            baseTableName: participation_qualification
+            baseColumnNames: participation_id
+            referencedTableName: participation
+            referencedColumnNames: id
+            constraintName: fk_pq_participation
+        - addForeignKeyConstraint:
+            baseTableName: participation_qualification
+            baseColumnNames: qualification_id
+            referencedTableName: qualification
+            referencedColumnNames: id
+            constraintName: fk_pq_qualification
+        - addForeignKeyConstraint:
+            baseTableName: participation_qualification
+            baseColumnNames: arme_id
+            referencedTableName: arme
+            referencedColumnNames: id
+            constraintName: fk_pq_arme
+        - addForeignKeyConstraint:
+            baseTableName: tache
+            baseColumnNames: seance_id
+            referencedTableName: seance
+            referencedColumnNames: id
+            constraintName: fk_tache_seance
+        - addForeignKeyConstraint:
+            baseTableName: tache
+            baseColumnNames: statut_id
+            referencedTableName: tache_statut
+            referencedColumnNames: id
+            constraintName: fk_tache_statut
