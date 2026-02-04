@@ -145,6 +145,9 @@ databaseChangeLog:
             tableName: participation_qualification
             columns:
               - column:
+                  name: id
+                  type: uuid
+              - column:
                   name: participation_id
                   type: uuid
               - column:
@@ -159,23 +162,6 @@ databaseChangeLog:
               - column:
                   name: date
                   type: date
-
-  - changeSet:
-      id: 9
-      author: prt
-      changes:
-        - createTable:
-            tableName: tache_statut
-            columns:
-              - column:
-                  name: id
-                  type: uuid
-              - column:
-                  name: libelle
-                  type: text
-              - column:
-                  name: is_terminee
-                  type: boolean
 
   - changeSet:
       id: 10
@@ -197,8 +183,8 @@ databaseChangeLog:
                   name: echeance_at
                   type: date
               - column:
-                  name: statut_id
-                  type: uuid
+                  name: statut
+                  type: text
 
   # ----- Ajout des Primary Keys -----
   - changeSet:
@@ -235,12 +221,8 @@ databaseChangeLog:
             constraintName: pk_participation
         - addPrimaryKey:
             tableName: participation_qualification
-            columnNames: participation_id,qualification_id,arme_id
-            constraintName: pk_participation_qualification
-        - addPrimaryKey:
-            tableName: tache_statut
             columnNames: id
-            constraintName: pk_tache_statut
+            constraintName: pk_participation_qualification
         - addPrimaryKey:
             tableName: tache
             columnNames: id
@@ -299,9 +281,3 @@ databaseChangeLog:
             referencedTableName: seance
             referencedColumnNames: id
             constraintName: fk_tache_seance
-        - addForeignKeyConstraint:
-            baseTableName: tache
-            baseColumnNames: statut_id
-            referencedTableName: tache_statut
-            referencedColumnNames: id
-            constraintName: fk_tache_statut
