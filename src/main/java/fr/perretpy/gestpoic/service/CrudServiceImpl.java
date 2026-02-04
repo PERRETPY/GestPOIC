@@ -2,7 +2,6 @@ package fr.perretpy.gestpoic.service;
 
 import fr.perretpy.gestpoic.exception.InvalidParameterException;
 import fr.perretpy.gestpoic.mapper.Mapper;
-import jakarta.persistence.EntityNotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -22,12 +21,14 @@ public abstract class CrudServiceImpl<E, C, U, D, L, ID>
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<L> getAll(Pageable pageable) {
         Page<E> page = this.repository.findAll(pageable);
         return page.map(mapper::toListDto);
     }
 
     @Override
+    @Transactional
     public D create(C dto) {
         if (dto == null) {
             throw new InvalidParameterException("Create object cannot be null");
@@ -38,6 +39,7 @@ public abstract class CrudServiceImpl<E, C, U, D, L, ID>
     }
 
     @Override
+    @Transactional
     public D update(ID id, U dto) {
         if (id == null) {
             throw new InvalidParameterException("id cannot be null");
@@ -47,21 +49,29 @@ public abstract class CrudServiceImpl<E, C, U, D, L, ID>
         }
 
         E existingEntity = repository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("id doesn't exist"));
+                .orElseThrow(() -> new ResourceNotFoundException("Entity not found"));
         mapper.updateEntity(existingEntity, dto);
         return mapper.toDetailDto(repository.save(existingEntity));
     }
 
     @Override
+    @Transactional
     public void delete(ID id) {
+        if (id == null) {
+            throw new InvalidParameterException("ID cannot be null");
+        }
+        if (!repository.existsById(id)) {
+          throw new ResourceNotFoundException("Entity not found");
+        }
         repository.deleteById(id);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Optional<D> getById(ID id) {
-        if (id == null) {
-            throw new InvalidParameterException("ID null");
-        }
-        return repository.findById(id).map(mapper::toDetailDto);
+      if (id == null) {
+        throw new InvalidParameterException("ID cannot be null");
+      }
+      return repository.findById(id).map(mapper::toDetailDto);
     }
 }
